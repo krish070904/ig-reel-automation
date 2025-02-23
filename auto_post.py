@@ -150,7 +150,9 @@ def process_next_post():
 # For local testing, we use schedule to run at a set time. (For example, every day at 06:00 UTC.)
 schedule.every().day.at("12:50").do(process_next_post)
 
-print("Automation started. Waiting for scheduled time (06:50 daily)...")
-while True:
-    schedule.run_pending()
-    time.sleep(60)
+#print("Automation started. Waiting for scheduled time (06:50 daily)...")
+#while True:
+ #   schedule.run_pending()
+  #  time.sleep(60)
+print("Testing process_next_post() now...")
+process_next_post()
