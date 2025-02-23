@@ -2,9 +2,9 @@ name: Instagram Reel Automation
 
 on:
   schedule:
-    # This workflow runs daily at 06:00 UTC (adjust the cron schedule if needed)
+    # Runs at 06:00 UTC daily (adjust if needed)
     - cron: '0 6 * * *'
-  workflow_dispatch:  # Allows manual triggering of the workflow
+  workflow_dispatch:  # Allows manual triggering
 
 jobs:
   post_reel:
@@ -23,7 +23,6 @@ jobs:
         run: |
           pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib schedule requests
 
-      # Decode and write Google Drive credentials from secret (if provided)
       - name: Set up Google Drive credentials
         if: env.GOOGLE_DRIVE_CREDENTIALS_BASE64 != ''
         run: |
