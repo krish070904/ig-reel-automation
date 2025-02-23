@@ -148,7 +148,7 @@ def process_next_post():
 
 # === Step G: Scheduling the Script ===
 # For local testing, we use schedule to run at a set time. (For example, every day at 06:00 UTC.)
-schedule.every().day.at("01:37").do(process_next_post)
+schedule.every().day.at("01:42").do(process_next_post)
 
 print("Automation started. Waiting for scheduled time (06:00 daily)...")
 while True:
