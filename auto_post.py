@@ -176,7 +176,7 @@ def process_next_post():
 # Step G: Schedule the script to run at a specific time daily
 # ====================================================
 # Example: Run every day at 06:00 (UTC)
-schedule.every().day.at("06:00").do(process_next_post)
+schedule.every().day.at("13:07").do(process_next_post)
 
 print("Automation started. Waiting for scheduled time (06:00 daily)...")
 while True:
