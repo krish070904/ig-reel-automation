@@ -3,7 +3,7 @@ name: Instagram Reel Automation
 on:
   schedule:
     # Runs at 20:30 UTC daily (which is 1:30 AM local time if your timezone is UTC+5:00)
-    - cron: '30 20 * * *'
+    - cron: '7 20 * * *'
   workflow_dispatch:
 
 jobs:
