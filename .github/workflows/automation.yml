@@ -42,8 +42,8 @@ jobs:
       # Commit updated CSV file back to the repository (optional, for persistence)
       - name: Commit updated CSV file
         run: |
-          git config --global user.email "youremail@example.com"    # Replace with your email
-          git config --global user.name "yourusername"                 # Replace with your GitHub username
+          git config --global user.email "krishna.official0717@gmail.com"    # Replace with your email
+          git config --global user.name "krish070904"                 # Replace with your GitHub username
           git add posts.csv
           git commit -m "Update posts.csv after posting a reel" || echo "No changes to commit"
           git push
