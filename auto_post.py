@@ -9,33 +9,36 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
 
-# Decode Google Drive credentials if provided via secret
+# === Step A: Set up Google Drive Credentials ===
+# If a Base64 encoded secret is provided, decode it and write credentials.json
 credentials_base64 = os.environ.get("GOOGLE_DRIVE_CREDENTIALS_BASE64")
 SERVICE_ACCOUNT_FILE = "credentials.json"
 if credentials_base64:
     with open(SERVICE_ACCOUNT_FILE, "wb") as f:
         f.write(base64.b64decode(credentials_base64))
 
-# Read sensitive configuration from environment variables
+# === Step B: Read Configuration from Environment Variables ===
 INSTAGRAM_USER_ID = os.environ.get("INSTAGRAM_USER_ID")
 ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
 DRIVE_FOLDER_ID = os.environ.get("DRIVE_FOLDER_ID")
-
 CSV_FILE = "posts.csv"
-DOWNLOAD_DIR = "downloads"
+DOWNLOAD_DIR = "downloads"  # Local directory to temporarily download videos
+
 DRIVE_SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
 
-# Set up Google Drive API client
+# === Step C: Set up Google Drive API Client ===
 credentials = service_account.Credentials.from_service_account_file(
     SERVICE_ACCOUNT_FILE, scopes=DRIVE_SCOPES)
 drive_service = build('drive', 'v3', credentials=credentials)
 
 def list_files_in_folder(folder_id):
+    """List video files in the specified Google Drive folder."""
     query = f"'{folder_id}' in parents and mimeType contains 'video/'"
     results = drive_service.files().list(q=query, fields="files(id, name)").execute()
     return results.get('files', [])
 
 def download_file(file_id, destination):
+    """Download a file from Google Drive to a local destination."""
     request = drive_service.files().get_media(fileId=file_id)
     fh = io.FileIO(destination, 'wb')
     downloader = MediaIoBaseDownload(fh, request)
@@ -46,9 +49,15 @@ def download_file(file_id, destination):
     fh.close()
 
 def get_public_url(drive_file_id):
+    """
+    Generate a public download URL for a Google Drive file.
+    Note: Your file must be shared publicly.
+    """
     return f"https://drive.google.com/uc?export=download&id={drive_file_id}"
 
+# === Step D: Instagram Graph API Function ===
 def post_instagram_reel(video_url, caption):
+    """Post a reel to Instagram using the Graph API, with polling until the media is ready."""
     create_url = f"https://graph.facebook.com/v17.0/{INSTAGRAM_USER_ID}/media"
     params = {
         "media_type": "REELS",
@@ -65,13 +74,14 @@ def post_instagram_reel(video_url, caption):
         return None
     creation_id = data["id"]
     time.sleep(2)
+    
     publish_url = f"https://graph.facebook.com/v17.0/{INSTAGRAM_USER_ID}/media_publish"
     publish_params = {
         "creation_id": creation_id,
         "access_token": ACCESS_TOKEN
     }
     max_retries = 10
-    retry_delay = 10
+    retry_delay = 10  # seconds
     for attempt in range(max_retries):
         publish_response = requests.post(publish_url, params=publish_params)
         publish_data = publish_response.json()
@@ -87,7 +97,9 @@ def post_instagram_reel(video_url, caption):
             break
     return publish_data
 
+# === Step E: CSV Handling Functions ===
 def load_posts(csv_file):
+    """Load the CSV file containing posts (columns: filename, caption)."""
     posts = []
     with open(csv_file, newline='', encoding='utf-8') as f:
         reader = csv.DictReader(f)
@@ -96,6 +108,7 @@ def load_posts(csv_file):
     return posts
 
 def save_posts(csv_file, posts):
+    """Save the updated list of posts back to the CSV."""
     with open(csv_file, 'w', newline='', encoding='utf-8') as f:
         if posts:
             fieldnames = posts[0].keys()
@@ -104,6 +117,7 @@ def save_posts(csv_file, posts):
             for row in posts:
                 writer.writerow(row)
 
+# === Step F: Main Posting Function ===
 def process_next_post():
     posts = load_posts(CSV_FILE)
     if not posts:
@@ -132,14 +146,17 @@ def process_next_post():
     else:
         print("Failed to post reel.")
 
-# For local testing, you might bypass the scheduler:
-# print("Testing process_next_post() now...")
-# process_next_post()
+# === Step G: Scheduling the Script ===
+# For local testing, we use schedule to run at a set time. (For example, every day at 06:00 UTC.)
+schedule.every().day.at("01:37").do(process_next_post)
 
-# === Scheduling Section ===
-# IMPORTANT: For GitHub Actions, remove the infinite loop. For local testing, you can use:
-schedule.every().day.at("06:00").do(process_next_post)
-print("Automation started. Waiting for scheduled time (06:00 daily)...")
-while True:
-    schedule.run_pending()
-    time.sleep(60)
+print("Running process_next_post() now...")
+process_next_post()
+#print("Automation started. Waiting for scheduled time (06:00 daily)...")
+#while True:
+ #   schedule.run_pending()
+  #  time.sleep(60)
+
+   # print("Current time:", time.strftime("%H:%M"))
+
+##UNDO THvfsfw
