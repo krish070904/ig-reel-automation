@@ -2,8 +2,8 @@ name: Instagram Reel Automation
 
 on:
   schedule:
-    # Runs at 00:23 UTC daily for testing (adjust the cron schedule as needed)
-    - cron: '20 11 * * *'
+    # For testing, this cron runs at 00:23 UTC daily.
+    - cron: '23 0 * * *'
   workflow_dispatch:  # Allows manual triggering
 
 jobs:
@@ -23,7 +23,7 @@ jobs:
         run: |
           pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib schedule requests
 
-      # If you stored your Google Drive credentials as a Base64 secret, decode and write them to a file.
+      # Decode and set up Google Drive credentials (if provided)
       - name: Set up Google Drive credentials
         if: env.GOOGLE_DRIVE_CREDENTIALS_BASE64 != ''
         run: |
@@ -39,11 +39,11 @@ jobs:
         run: |
           python auto_post.py
 
-      # Commit the updated CSV file back to the repository so posted entries are removed permanently.
+      # Commit updated CSV file back to the repository (optional, for persistence)
       - name: Commit updated CSV file
         run: |
-          git config --global user.email "krishna.official0717@gmail.com"    # Replace with your email
-          git config --global user.name "krish070904"                 # Replace with your GitHub username
+          git config --global user.email "youremail@example.com"    # Replace with your email
+          git config --global user.name "yourusername"                 # Replace with your GitHub username
           git add posts.csv
           git commit -m "Update posts.csv after posting a reel" || echo "No changes to commit"
           git push
