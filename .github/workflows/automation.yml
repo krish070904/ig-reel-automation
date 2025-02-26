@@ -3,7 +3,7 @@ name: Instagram Reel Automation
 on:
   schedule:
     # For testing, this cron runs at 00:23 UTC daily.
-    - cron: '23 0 * * *'
+    - cron: '40 6 * * *'
   workflow_dispatch:  # Allows manual triggering
 
 jobs:
